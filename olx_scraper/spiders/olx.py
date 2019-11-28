@@ -14,7 +14,8 @@ class OlxSpider(CrawlSpider):
             'https://pb.olx.com.br/paraiba/joao-pessoa/jardim-oceania/imoveis'
             ]
     rules = (
-            Rule(LinkExtractor(allow=(),restrict_css=('.next',)),
+            Rule(LinkExtractor(allow=(),#restrict_css=('.next',)
+                ),
                 callback="parse_item",
                 follow=False),
                 #follow=False),
@@ -28,12 +29,14 @@ class OlxSpider(CrawlSpider):
     #response.css('.page_listing .section_OLXad-list .item').extract()[0]
 
     def parse_item(self, response):
-        #print('Processing ... ' + response.url)
-        for ad in response.css('.page_listing .section_OLXad-list .item'):
+        print('Processing ... ' + response.url)
+        for ad in response.css('.page_listing .section_OLXad-list .list .item'):
             anuncio = OlxScraperItem()
-            anuncio['title'] = ad.css('.OLXad-list-link::attr(title)').extract()
-            anuncio['price'] = ad.css('.OLXad-list-price').extract()
-            anuncio['url'] = ad.css('.OLXad-list-link::attr(href)').extract()
-            yield anuncio
+            anuncio['ad_id'] = ad.css('.OLXad-list-link::attr(id)').get()
+            anuncio['vendor_id'] = ad.css('.item::attr(data-account_id)').get()
+            anuncio['title'] = ad.css('.OLXad-list-link::attr(title)').get()
+            anuncio['price'] = ad.css('.OLXad-list-price').get()
+            anuncio['url'] = ad.css('.OLXad-list-link::attr(href)').get()
+            print(anuncio)
             sleep(2)
 
