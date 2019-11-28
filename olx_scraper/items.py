@@ -8,12 +8,12 @@
 import scrapy
 
 
-class OlxScraperItem(scrapy.Item):
+class AdItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
     ad_id = scrapy.Field()
     vendor_id= scrapy.Field()
-    title = scrapy.Field()
-    price = scrapy.Field()
-    url = scrapy.Field()
+    ad_title = scrapy.Field()
+    ad_price = scrapy.Field()
+    ad_url = scrapy.Field()
     #pass
