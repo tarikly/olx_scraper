@@ -34,7 +34,7 @@ class CarsSpider(scrapy.Spider):
             '//div[contains(@class, "module_pagination")]//a[@rel = "next"]/@href'
         )
         if next_page:
-            pass
+            #pass
             self.log('Próxima Página: {}'.format(next_page.extract_first()))
             yield scrapy.Request(
                 url=next_page.extract_first(), callback=self.parse
@@ -47,25 +47,45 @@ class CarsSpider(scrapy.Spider):
             "//div[contains(span, 'Ano')]")[0].css('a::text'
             ).get()
 
-        color = response.xpath(
-            "//div[contains(span, 'Cor')]")[0].css('span::text'
-            )[1].get()
+        try:
+            color = response.xpath("//div[contains(span, 'Cor')]")[0].css('span::text')[1].get()
+        except IndexError:
+            color = "N/A"
+        try:
+            doors = response.xpath("//div[contains(span, 'Portas')]")[0].css('span::text')[1].get()
+            doors = response.xpath("//div[contains(span, 'Portas')]")[0].css('span::text')[1].get()
+        except IndexError:
+            doors = "N/A"
 
-        doors = response.xpath(
-                "//div[contains(span, 'Portas')]")[0].css('span::text'
-            )[1].get()
+        try:
+            fuel = response.xpath("//div[contains(span, 'Combustível')]")[0].css('a::text').get()
+        except IndexError:
+            fuel = "N/A"
 
-        fuel = response.xpath(
-            "//div[contains(span, 'Combustível')]")[0].css('a::text'
-            ).get()
+        try:
+            mileage = response.xpath("//div[contains(span, 'Quilometragem')]")[0].css('span::text')[1].get()
+        except IndexError:
+            mileage = "N/A"
 
-        mileage = response.xpath(
-            "//div[contains(span, 'Quilometragem')]")[0].css('span::text'
-            )[1].get()
+        try:
+            transmission = response.xpath("//div[contains(span, 'Câmbio')]")[0].css('span::text')[1].get()
+        except IndexError:
+            transmission = "N/A"
 
-        exchange = response.xpath(
-            "//span[contains(text(), 'Câmbio')]/following-sibling::strong/text()"
-            ).extract_first()
+        try:
+            zip_code = response.xpath("//div[contains(@data-testid, 'ad-properties')]").xpath("*[contains(., dd)]")[0].css('dd::text').get()
+        except:
+            zip_code = "N/A"
+
+        try:
+            city = response.xpath("//div[contains(@data-testid, 'ad-properties')]").xpath("*[contains(., dd)]")[1].css('dd::text').get()
+        except:
+            city = "N/A"
+
+        try:
+            city_block = response.xpath("//div[contains(@data-testid, 'ad-properties')]").xpath("*[contains(., dd)]")[2].css('dd::text').get()
+        except:
+            city_block = "N/A"
 
         county = response.xpath(
             "//span[contains(text(), 'Município')]/following-sibling::strong/a/@title"
@@ -79,7 +99,21 @@ class CarsSpider(scrapy.Spider):
             'doors': doors,
             'fuel': fuel,
             'mileage': mileage,
-            'exchange': exchange,
-            'county': county,
+            'transmission': transmission,
+            'zip_code': zip_code,
+            'city': city,
+            'city_block': city_block,
         }
+        car = {}
+        car['title'] = title
+        car['year'] = year
+        car['color'] = color
+        car['doors'] = doors
+        car['fuel'] = fuel
+        car['mileage'] = mileage
+        car['transmission'] = transmission
+        car['zip_code'] = zip_code
+        car['city'] = city
+        car['city_block'] = city_block
+        print(car)
         sleep(2)
