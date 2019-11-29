@@ -53,7 +53,6 @@ class CarsSpider(scrapy.Spider):
             color = "N/A"
         try:
             doors = response.xpath("//div[contains(span, 'Portas')]")[0].css('span::text')[1].get()
-            doors = response.xpath("//div[contains(span, 'Portas')]")[0].css('span::text')[1].get()
         except IndexError:
             doors = "N/A"
 
