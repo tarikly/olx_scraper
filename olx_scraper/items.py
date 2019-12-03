@@ -7,13 +7,13 @@
 
 import scrapy
 
-
-class AdItem(scrapy.Item):
+class Ad(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
-    ad_id = scrapy.Field()
-    vendor_id= scrapy.Field()
+    #ad_id = scrapy.Field()
+    #vendor_id= scrapy.Field()
     ad_title = scrapy.Field()
-    ad_price = scrapy.Field()
+    #ad_price = scrapy.Field()
+    ad_content = scrapy.Field()
     ad_url = scrapy.Field()
     #pass

@@ -3,7 +3,7 @@
 import scrapy
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
-from olx_scraper.items import AdItem
+from olx_scraper.items import Ad
 from time import sleep
 
 class OlxSpider(CrawlSpider):
@@ -34,7 +34,7 @@ class OlxSpider(CrawlSpider):
         #print()
         for ad in response.css('.page_listing .section_OLXad-list .list .item'):
             print('Processing. ' + response.url)
-            anuncio = AdItem()
+            anuncio = Ad()
             anuncio['ad_id'] = ad.css('.OLXad-list-link::attr(id)').get()
             anuncio['vendor_id'] = ad.css('.item::attr(data-account_id)').get()
             anuncio['ad_title'] = ad.css('.OLXad-list-link::attr(title)').get()

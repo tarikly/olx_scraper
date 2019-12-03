@@ -1,30 +1,54 @@
 # -*- coding: utf-8 -*-
-
 import scrapy
-from scrapy.spiders import CrawlSpider, Rule
-from olx_scraper.items import AdItem
 from time import sleep
+import js2xml
+import lxml.etree
+from parsel import Selector
+#javascript = response.css('script::text')[4].get()
+#xml = lxml.etree.tostring(js2xml.parse(javascript), encoding='unicode')
+#selector = Selector(text=xml)
 
-class AdsSpider(CrawlSpider):
-    name = "ads_spider"
-    def start_requests(self):
-        start_urls = ['https://pb.olx.com.br/autos-e-pecas/motos',]
-        for url in start_urls:
-            yield scrapy.Request(url=url, callback=self.parse)
+
+class CarsSpider(scrapy.Spider):
+
+    name = 'ads'
+    allowed_domains = ['pb.olx.com.br']
+    start_urls = ['https://pb.olx.com.br/autos-e-pecas/motos']
+
 
     def parse(self, response):
-        #print('Processing. ' + response.url)
-        #sleep(2)
-        #print()
-        for ad in response.css('.page_listing .section_OLXad-list .list .item'):
-            print('Processing... ' + response.url)
-            anuncio = AdItem()
-            anuncio['ad_id'] = ad.css('.OLXad-list-link::attr(id)').get()
-            anuncio['vendor_id'] = ad.css('.item::attr(data-account_id)').get()
-            anuncio['ad_title'] = ad.css('.OLXad-list-link::attr(title)').get()
-            anuncio['ad_price'] = ad.css('.OLXad-list-price::text').get()
-            anuncio['ad_url'] = ad.css('.OLXad-list-link::attr(href)').get()
-            if anuncio['ad_id']:
-                print(anuncio)
-            sleep(2)
+        print('Processando página: %s' % response.url)
+        url_title = response.xpath('//title/text()').get()
+        print('Título da página: %s' % url_title)
 
+        items = response.xpath(
+            '//ul[@id="main-ad-list"]/li[not(contains(@class, "list_native"))]'
+        )
+        print('QUANTIDADE DE ANÚNCIOS NA PÁGINA: %s'% len(items))
+
+        for item in items:
+            url = item.xpath('./a/@href').get()
+            yield scrapy.Request(url=url, callback=self.parse_detail)
+        next_page = response.xpath(
+            '//div[contains(@class, "module_pagination")]//a[@rel = "next"]/@href'
+        )
+        if next_page:
+            #pass
+            self.log('Próxima Página: {}'.format(next_page.get()))
+            yield scrapy.Request(
+                url=next_page.extract_first(), callback=self.parse
+            )
+
+    def parse_detail(self, response):
+        javascript = response.css('script::text')[4].get()
+        xml = lxml.etree.tostring(js2xml.parse(javascript), encoding='unicode')
+        
+
+        print(response.css('script::text')[4].getall())
+        sleep(2)
+
+    #scrapyrt - scrapy http api
+
+    def modify_realtime_request(self, request):
+        request.meta["dont_redirect"] = True
+        return request
